@@ -1,6 +1,7 @@
 package gzip
 
 import (
+	"compress/flate"
 	"compress/gzip"
 	"fmt"
 	"io"
@@ -22,6 +23,11 @@ type Archive struct {
 
 // New creates an archive that uses the .tar.gz file format.
 func New(logger log.Logger, root string, skipSymlinks bool, compressionLevel int) *Archive {
+	if compressionLevel < 0 {
+		compressionLevel = flate.DefaultCompression
+	} else if compressionLevel > flate.BestCompression {
+		compressionLevel = flate.BestCompression
+	}
 	return &Archive{logger, root, compressionLevel, skipSymlinks}
 }
 

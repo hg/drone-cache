@@ -1,11 +1,11 @@
 package archive
 
 import (
-	"compress/flate"
 	"io"
 
 	"github.com/meltwater/drone-cache/archive/gzip"
 	"github.com/meltwater/drone-cache/archive/tar"
+	"github.com/meltwater/drone-cache/archive/zstd"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -14,8 +14,10 @@ import (
 const (
 	Gzip = "gzip"
 	Tar  = "tar"
+	Zstd = "zstd"
 
-	DefaultCompressionLevel = flate.DefaultCompression
+	// Negative compression levels are reset to the default value for the chosen algorithm.
+	DefaultCompressionLevel = -1
 	DefaultArchiveFormat    = Tar
 )
 
@@ -45,6 +47,8 @@ func FromFormat(logger log.Logger, root string, format string, opts ...Option) A
 		return gzip.New(logger, root, options.skipSymlinks, options.compressionLevel)
 	case Tar:
 		return tar.New(logger, root, options.skipSymlinks)
+	case Zstd:
+		return zstd.New(logger, root, options.skipSymlinks, options.compressionLevel)
 	default:
 		level.Error(logger).Log("msg", "unknown archive format", "format", format)
 		return tar.New(logger, root, options.skipSymlinks) // DefaultArchiveFormat

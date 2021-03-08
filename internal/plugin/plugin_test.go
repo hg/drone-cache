@@ -60,6 +60,7 @@ var (
 	formats = []string{
 		archive.Gzip,
 		archive.Tar,
+		archive.Zstd,
 	}
 )
 
